@@ -1,4 +1,7 @@
 package com.cacf.cdt.bffclone.repository;
 
-public interface CDTUserRepository {
+import com.cacf.cdt.bffclone.entity.cdt.user.CDTUser;
+import org.springframework.data.repository.CrudRepository;
+
+public interface CDTUserRepository extends CrudRepository<CDTUser, String> {
 }
