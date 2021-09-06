@@ -8,5 +8,7 @@ import java.util.List;
 
 @Mapper
 public interface CDTUserMapper {
-    List<CDTUserDTO> toDTOs(List<CDTUser> user);
+    CDTUserDTO toDTO(CDTUser user);
+
+    List<CDTUserDTO> toDTOs(List<CDTUser> users);
 }

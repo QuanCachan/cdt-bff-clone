@@ -6,13 +6,11 @@ import com.cacf.cdt.bffclone.repository.CDTUserRepository;
 import com.cacf.cdt.bffclone.repository.vo.TupleVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
-
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.mapping;
-import static java.util.stream.Collectors.toList;
 
 @Service
 @RequiredArgsConstructor
@@ -20,13 +18,23 @@ public class CDTUserService {
     private final CDTUserRepository cdtUserRepository;
     private final CDTUserMapper cdtUserMapper;
 
-    public Map<String, List<String>> findAllAgencies() {
-        return cdtUserRepository.findAgencies()
-                .stream()
-                .collect(groupingBy(TupleVO::getT1, mapping(TupleVO::getT2, toList())));
+    /**
+     * Find all agencies from files
+     *
+     * @return A {@link Map} with agency region as key and agencies name into that region as value
+     */
+    public Mono<Map<String, Collection<String>>> findAllAgencies() {
+        return Flux.fromIterable(cdtUserRepository.findAgencies())
+                .collectMultimap(TupleVO::getT1, TupleVO::getT2);
     }
 
-    public List<CDTUserDTO> findAllAdvisorsByAgency(String agency) {
-        return cdtUserMapper.toDTOs(cdtUserRepository.findAllAdvisorsByAgency(agency));
+    /**
+     * Find all users of the given agency with advisor role
+     *
+     * @param agency The advisors agency
+     * @return The advisors of the given agency or empty
+     */
+    public Flux<CDTUserDTO> findAllAdvisorsByAgency(String agency) {
+        return Flux.fromIterable(cdtUserRepository.findAllAdvisorsByAgency(agency)).map(cdtUserMapper::toDTO);
     }
 }
