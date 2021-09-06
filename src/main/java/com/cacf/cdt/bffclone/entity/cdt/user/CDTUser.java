@@ -26,10 +26,6 @@ public class CDTUser implements Serializable {
     @Id
     private String number;
 
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    private CDTUserRole role;
-
     @NotBlank
     private String firstName;
 
@@ -37,4 +33,8 @@ public class CDTUser implements Serializable {
     private String lastName;
 
     private String agency;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private CDTUserRole role;
 }

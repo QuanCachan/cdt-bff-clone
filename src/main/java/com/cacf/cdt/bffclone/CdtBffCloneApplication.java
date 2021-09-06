@@ -1,7 +1,12 @@
 package com.cacf.cdt.bffclone;
 
+import com.cacf.cdt.bffclone.entity.cdt.task.CDTTask;
+import com.cacf.cdt.bffclone.entity.cdt.task.CDTTaskCategory;
+import com.cacf.cdt.bffclone.entity.cdt.task.CDTTaskPriority;
+import com.cacf.cdt.bffclone.entity.cdt.task.CDTTaskType;
 import com.cacf.cdt.bffclone.entity.cdt.user.CDTUser;
 import com.cacf.cdt.bffclone.entity.cdt.user.CDTUserRole;
+import com.cacf.cdt.bffclone.entity.idd.CollectionWrapper;
 import com.cacf.cdt.bffclone.entity.idd.IDDBorrower;
 import com.cacf.cdt.bffclone.entity.idd.IDDDocument;
 import com.cacf.cdt.bffclone.entity.idd.IDDEgdCode;
@@ -49,8 +54,8 @@ public class CdtBffCloneApplication {
         Map<String, String> regionsByAgency = new HashMap<>();
         nord.forEach(city -> regionsByAgency.put(city, "A"));
         sud.forEach(city -> regionsByAgency.put(city, "B"));
-
         val agencies = List.copyOf(regionsByAgency.keySet());
+
         val advisors = IntStream.range(1, NB_ADVISORS)
                 .mapToObj(n ->
                         CDTUser.builder()
@@ -60,14 +65,22 @@ public class CdtBffCloneApplication {
                                 .lastName(FAKER.name().lastName())
                                 .agency(randomInList(agencies))
                                 .build()
-                )
-                .collect(Collectors.toUnmodifiableList());
-
+                ).collect(Collectors.toList());
         cdtUserRepo.saveAll(advisors);
+
+        val carolineGreen = CDTUser.builder()
+                .number(String.format("S%05d", 0))
+                .role(CDTUserRole.ADVISOR)
+                .firstName("Caroline")
+                .lastName("Green")
+                .agency("Roubaix")
+                .build();
+        cdtUserRepo.save(carolineGreen);
 
         val productType = List.of("PB", "RAC", "CR");
         val egd = List.of(IDDEgdCode.values());
-        val inputChannel = List.of("SE", "PAPER");
+        val inputChannel = List.of("WEB", "TEL");
+        val subscriptionModes = List.of("SE", "PAPER");
         val documentStatus = List.of("TO_VERIFY", "NON_COMPLIANT", "COMPLIANT");
 
         Supplier<IDDBorrower> borrower = () -> IDDBorrower.builder()
@@ -76,29 +89,20 @@ public class CdtBffCloneApplication {
                 .lastName(FAKER.name().lastName())
                 .email(FAKER.internet().emailAddress())
                 .phoneNumber(FAKER.phoneNumber().phoneNumber())
-                .attachment(
-                        IDDDocument.builder()
-                                .code("CNI")
-                                .status(randomInList(documentStatus))
-                                .build()
-                )
-                .attachment(
-                        IDDDocument.builder()
-                                .code("JDD")
-                                .status(randomInList(documentStatus))
-                                .build()
-                )
-                .attachment(
-                        IDDDocument.builder()
-                                .code("IMP")
-                                .status(randomInList(documentStatus))
-                                .build()
-                )
-                .document(
-                        IDDDocument.builder()
-                                .code("ELECTRONIC_CONTRACT")
-                                .status(randomInList(documentStatus))
-                                .build()
+                .attachments(CollectionWrapper.of(
+                                IDDDocument.builder()
+                                        .code("CNI")
+                                        .status(randomInList(documentStatus))
+                                        .build(),
+                                IDDDocument.builder()
+                                        .code("JDD")
+                                        .status(randomInList(documentStatus))
+                                        .build(),
+                                IDDDocument.builder()
+                                        .code("IMP")
+                                        .status(randomInList(documentStatus))
+                                        .build()
+                        )
                 )
                 .build();
 
@@ -109,13 +113,23 @@ public class CdtBffCloneApplication {
                             .number(String.format("S%011d", n))
                             .borrower(borrower.get())
                             .coBorrower(borrower.get())
+                            .documents(
+                                    CollectionWrapper.of(
+                                            IDDDocument.builder()
+                                                    .code("ELECTRONIC_CONTRACT")
+                                                    .status(randomInList(documentStatus))
+                                                    .build()
+                                    )
+                            )
                             .advisor(advisor)
                             .amount(BigDecimal.valueOf(FAKER.number().randomDouble(2, 1_000, 50_000)))
                             .agency(advisor.getAgency())
                             .agencyRegion(regionsByAgency.get(advisor.getAgency()))
                             .productType(randomInList(productType)) // PB, RAC, CR
+                            .subProductType("Type de sous-produit")
                             .dlgNumber(FAKER.random().nextInt(1, 5)) // 1,2,3,4
                             .egdCode(randomInList(egd)) //
+                            .ade(FAKER.random().nextBoolean())
                             .enteredDate(
                                     FAKER
                                             .date()
@@ -129,12 +143,21 @@ public class CdtBffCloneApplication {
                             .enteredBy(randomInList(advisors))
                             .supportedBy(randomInList(advisors))
                             .underStudyBy(randomInList(advisors))
-                            .enteredInputChannel(randomInList(inputChannel)) // SE, PAPER
+                            .enteredInputChannel(randomInList(inputChannel))
+                            .subscriptionMode(randomInList(subscriptionModes))
                             .build();
                     iddFile.setReceivedDate(LocalDateTime.now());
+
+                    val task = CDTTask.builder()
+                            .affectedTo(advisor)
+                            .category(randomInList(List.of(CDTTaskCategory.values())))
+                            .type(randomInList(List.of(CDTTaskType.values())))
+                            .priority(randomInList(List.of(CDTTaskPriority.values())))
+                            .file(iddFile)
+                            .build();
+                    iddFile.setTask(task);
                     return iddFile;
-                })
-                .collect(Collectors.toUnmodifiableList())
+                }).collect(Collectors.toList())
         );
     }
 

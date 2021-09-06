@@ -18,11 +18,6 @@ import javax.persistence.Embeddable;
 import java.util.ArrayList;
 import java.util.List;
 
-@TypeDefs({
-        @TypeDef(name = "string-array", typeClass = StringArrayType.class),
-        @TypeDef(name = "int-array", typeClass = IntArrayType.class),
-        @TypeDef(name = "json", typeClass = JsonType.class)
-})
 @Embeddable
 @Data
 @NoArgsConstructor
@@ -37,12 +32,7 @@ public class IDDBorrower {
     private String phoneNumber;
 
     @Type(type = "json")
-    @Column(columnDefinition = "jsonb")
-    @Singular
-    private List<IDDDocument> attachments = new ArrayList<>();
+    @Column(columnDefinition = "json")
+    private CollectionWrapper<IDDDocument> attachments = new CollectionWrapper<>();
 
-    @Type(type = "json")
-    @Column(columnDefinition = "jsonb")
-    @Singular
-    private List<IDDDocument> documents = new ArrayList<>();
 }
