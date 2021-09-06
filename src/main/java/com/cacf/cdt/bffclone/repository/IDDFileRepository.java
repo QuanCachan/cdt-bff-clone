@@ -1,5 +1,6 @@
 package com.cacf.cdt.bffclone.repository;
 
+import com.cacf.cdt.bffclone.entity.cdt.task.CDTTask_;
 import com.cacf.cdt.bffclone.entity.idd.IDDFile;
 import com.cacf.cdt.bffclone.entity.idd.IDDFile_;
 import com.cacf.cdt.bffclone.repository.vo.DateRangeVO;
@@ -19,10 +20,10 @@ import java.util.Optional;
 
 public interface IDDFileRepository extends PagingAndSortingRepository<IDDFile, String>, JpaSpecificationExecutor<IDDFile> {
     @Override
-    @EntityGraph(attributePaths = {IDDFile_.ENTERED_BY})
+    @EntityGraph(attributePaths = {IDDFile_.TASK, IDDFile_.TASK + "." + CDTTask_.AFFECTED_TO, IDDFile_.ENTERED_BY})
     Page<IDDFile> findAll(Specification<IDDFile> spec, Pageable pageable);
 
-    @EntityGraph(attributePaths = {IDDFile_.ADVISOR, IDDFile_.ENTERED_BY, IDDFile_.SUPPORTED_BY, IDDFile_.UNDER_STUDY_BY})
+    @EntityGraph(attributePaths = {IDDFile_.TASK, IDDFile_.TASK + "." + CDTTask_.AFFECTED_TO, IDDFile_.ADVISOR, IDDFile_.ENTERED_BY, IDDFile_.SUPPORTED_BY, IDDFile_.UNDER_STUDY_BY})
     Optional<IDDFile> findByNumber(String number);
 
     // FILTERS
@@ -30,8 +31,8 @@ public interface IDDFileRepository extends PagingAndSortingRepository<IDDFile, S
     @Query("select distinct f.productType from IDDFile f order by f.productType asc")
     List<String> findAllProductTypes();
 
-    @Query("select distinct f.enteredInputChannel from IDDFile f order by f.enteredInputChannel asc")
-    List<String> findAllEnteredInputChannels();
+    @Query("select distinct f.subscriptionMode from IDDFile f order by f.subscriptionMode asc")
+    List<String> findAllSubscriptionModes();
 
     @Query("select distinct f.dlgNumber from IDDFile f order by f.dlgNumber asc")
     List<Integer> findAllDlgNumbers();

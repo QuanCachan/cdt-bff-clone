@@ -1,13 +1,18 @@
 package com.cacf.cdt.bffclone.entity.idd;
 
+import com.cacf.cdt.bffclone.entity.cdt.task.CDTTask;
 import com.cacf.cdt.bffclone.entity.cdt.user.CDTUser;
+import com.vladmihalcea.hibernate.type.json.JsonType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -19,6 +24,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -28,6 +35,7 @@ import java.time.LocalDateTime;
 
 import static javax.persistence.ConstraintMode.NO_CONSTRAINT;
 
+@TypeDef(name = "json", typeClass = JsonType.class)
 @Table(name = "idd_files")
 @Entity
 @Data
@@ -62,6 +70,8 @@ public class IDDFile {
     private IDDEgdCode egdCode;
 
     private String productType;
+    private String subProductType;
+    private Boolean ade;
 
     private BigDecimal amount;
     private String agency;
@@ -73,6 +83,7 @@ public class IDDFile {
 
     private LocalDate enteredDate;
     private String enteredInputChannel;
+    private String subscriptionMode;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "enteredBy", referencedColumnName = "number", foreignKey = @ForeignKey(NO_CONSTRAINT))
@@ -86,6 +97,11 @@ public class IDDFile {
     @JoinColumn(name = "supportedBy", referencedColumnName = "number", foreignKey = @ForeignKey(NO_CONSTRAINT))
     private CDTUser supportedBy;
 
-//    @NotNull
-//    private ObjectNode raw;
+    @OneToOne(mappedBy = "file", cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn
+    private CDTTask task;
+
+    @Type(type = "json")
+    @Column(columnDefinition = "json")
+    private CollectionWrapper<IDDDocument> documents = new CollectionWrapper<>();
 }

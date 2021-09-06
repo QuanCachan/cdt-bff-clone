@@ -39,10 +39,10 @@ public class IDDBorrower {
     @Type(type = "json")
     @Column(columnDefinition = "jsonb")
     @Singular
-    private List<IDDBorrowerDocument> attachments = new ArrayList<>();
+    private List<IDDDocument> attachments = new ArrayList<>();
 
     @Type(type = "json")
     @Column(columnDefinition = "jsonb")
     @Singular
-    private List<IDDBorrowerDocument> documents = new ArrayList<>();
+    private List<IDDDocument> documents = new ArrayList<>();
 }

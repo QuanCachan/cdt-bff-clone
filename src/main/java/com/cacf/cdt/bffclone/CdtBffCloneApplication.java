@@ -3,7 +3,7 @@ package com.cacf.cdt.bffclone;
 import com.cacf.cdt.bffclone.entity.cdt.user.CDTUser;
 import com.cacf.cdt.bffclone.entity.cdt.user.CDTUserRole;
 import com.cacf.cdt.bffclone.entity.idd.IDDBorrower;
-import com.cacf.cdt.bffclone.entity.idd.IDDBorrowerDocument;
+import com.cacf.cdt.bffclone.entity.idd.IDDDocument;
 import com.cacf.cdt.bffclone.entity.idd.IDDEgdCode;
 import com.cacf.cdt.bffclone.entity.idd.IDDFile;
 import com.cacf.cdt.bffclone.repository.CDTUserRepository;
@@ -77,25 +77,25 @@ public class CdtBffCloneApplication {
                 .email(FAKER.internet().emailAddress())
                 .phoneNumber(FAKER.phoneNumber().phoneNumber())
                 .attachment(
-                        IDDBorrowerDocument.builder()
+                        IDDDocument.builder()
                                 .code("CNI")
                                 .status(randomInList(documentStatus))
                                 .build()
                 )
                 .attachment(
-                        IDDBorrowerDocument.builder()
+                        IDDDocument.builder()
                                 .code("JDD")
                                 .status(randomInList(documentStatus))
                                 .build()
                 )
                 .attachment(
-                        IDDBorrowerDocument.builder()
+                        IDDDocument.builder()
                                 .code("IMP")
                                 .status(randomInList(documentStatus))
                                 .build()
                 )
                 .document(
-                        IDDBorrowerDocument.builder()
+                        IDDDocument.builder()
                                 .code("ELECTRONIC_CONTRACT")
                                 .status(randomInList(documentStatus))
                                 .build()

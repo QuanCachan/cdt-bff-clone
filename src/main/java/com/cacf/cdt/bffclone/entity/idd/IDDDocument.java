@@ -12,7 +12,7 @@ import javax.persistence.Embeddable;
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
-public class IDDBorrowerDocument {
+public class IDDDocument {
     private String code;
     private String status;
 }

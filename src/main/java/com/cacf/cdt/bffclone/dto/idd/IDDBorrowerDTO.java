@@ -15,6 +15,6 @@ public class IDDBorrowerDTO {
     private String number;
     private String firstName;
     private String lastName;
-    private List<IDDBorrowerDocumentDTO> attachments;
-    private List<IDDBorrowerDocumentDTO> documents;
+    private List<IDDDocumentDTO> attachments;
+    private List<IDDDocumentDTO> documents;
 }
