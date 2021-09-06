@@ -12,6 +12,9 @@ import reactor.core.publisher.Mono;
 import java.util.Collection;
 import java.util.Map;
 
+/**
+ * Service to manage CDT Users
+ */
 @Service
 @RequiredArgsConstructor
 public class CDTUserService {

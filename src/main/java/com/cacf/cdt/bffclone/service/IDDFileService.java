@@ -25,6 +25,9 @@ import reactor.core.publisher.Mono;
 
 import java.util.Optional;
 
+/**
+ * Service to manage IDD files
+ */
 @Service
 @RequiredArgsConstructor
 public class IDDFileService {
@@ -58,6 +61,7 @@ public class IDDFileService {
         IDDFilesPageResponseDTO filesDTO = new IDDFilesPageResponseDTO();
         if (!iddFiles.isEmpty()) {
             filesDTO.setTotalAmount(iddFileAdvancedRepository.sumAmount(spec));
+//            filesDTO.setEnteredByFilter(cdtUserMapper.toDTOs(iddFileRepository.findAllEnteredBy(spec)));
         }
         pageResponseMapper.mapInto(filesDTO, iddFiles);
         return filesDTO;
