@@ -1,6 +1,9 @@
 package com.cacf.cdt.bffclone.service;
 
 import com.cacf.cdt.bffclone.dto.idd.filter.IDDFileFilterDTO;
+import com.cacf.cdt.bffclone.entity.cdt.task.CDTTaskPriority;
+import com.cacf.cdt.bffclone.entity.cdt.task.CDTTaskType;
+import com.cacf.cdt.bffclone.entity.cdt.task.CDTTask_;
 import com.cacf.cdt.bffclone.entity.cdt.user.CDTUser_;
 import com.cacf.cdt.bffclone.entity.idd.IDDEgdCode;
 import com.cacf.cdt.bffclone.entity.idd.IDDFile;
@@ -43,10 +46,13 @@ public class IDDFileSpecification implements Specification<IDDFile> {
                         hasProductTypes(),
                         hasEnteredDate(),
                         hasAmount(),
-                        hasEnteredInputChannel(),
+                        hasSubscriptionMode(),
                         hasEgdCodes(),
                         hasDlgNumbers(),
-                        hasEnteredByAdvisorNumbers()
+                        hasEnteredByAdvisorNumbers(),
+                        hasTaskTypes(),
+                        hasAffectedTo(),
+                        hasTaskPriorities()
                 )
                 .filter(Objects::nonNull)
                 .toArray(Predicate[]::new);
@@ -55,6 +61,17 @@ public class IDDFileSpecification implements Specification<IDDFile> {
         } else {
             return builder.and(predicates);
         }
+    }
+
+    private <E extends Enum<E>> Predicate isInEnum(Class<E> enumClass, Collection<String> collection, Path<E> path) {
+        return isIn(
+                Optional.ofNullable(collection)
+                        .orElse(Collections.emptySet())
+                        .stream()
+                        .map(code -> EnumUtils.getEnumIgnoreCase(enumClass, code))
+                        .collect(Collectors.toSet())
+                , path
+        );
     }
 
     private <T> Predicate isIn(Collection<T> collection, Path<T> path) {
@@ -73,7 +90,7 @@ public class IDDFileSpecification implements Specification<IDDFile> {
     }
 
     private Predicate hasAdvisorNumbers() {
-        return isIn(filter.getAdvisorNumbers(), root.get(IDDFile_.advisor).get(CDTUser_.number));
+        return isIn(filter.getAdvisors(), root.get(IDDFile_.advisor).get(CDTUser_.number));
     }
 
     private Predicate hasEnteredDate() {
@@ -116,19 +133,12 @@ public class IDDFileSpecification implements Specification<IDDFile> {
         }
     }
 
-    private Predicate hasEnteredInputChannel() {
-        return isIn(filter.getEnteredInputChannel(), root.get(IDDFile_.enteredInputChannel));
+    private Predicate hasSubscriptionMode() {
+        return isIn(filter.getSubscriptionModes(), root.get(IDDFile_.subscriptionMode));
     }
 
     private Predicate hasEgdCodes() {
-        return isIn(
-                Optional.ofNullable(filter.getEgdCodes())
-                        .orElse(Collections.emptySet())
-                        .stream()
-                        .map(code -> EnumUtils.getEnumIgnoreCase(IDDEgdCode.class, code))
-                        .collect(Collectors.toSet())
-                , root.get(IDDFile_.egdCode)
-        );
+        return isInEnum(IDDEgdCode.class, filter.getEgdCodes(), root.get(IDDFile_.egdCode));
     }
 
     private Predicate hasDlgNumbers() {
@@ -136,19 +146,18 @@ public class IDDFileSpecification implements Specification<IDDFile> {
     }
 
     private Predicate hasEnteredByAdvisorNumbers() {
-        return isIn(filter.getEnteredByAdvisorNumbers(), root.get(IDDFile_.enteredBy).get(CDTUser_.number));
+        return isIn(filter.getEnteredBy(), root.get(IDDFile_.enteredBy).get(CDTUser_.number));
     }
 
+    private Predicate hasTaskTypes() {
+        return isInEnum(CDTTaskType.class, filter.getTaskTypes(), root.get(IDDFile_.task).get(CDTTask_.type));
+    }
 
+    private Predicate hasAffectedTo() {
+        return isIn(filter.getTaskAffectedTo(), root.get(IDDFile_.task).get(CDTTask_.affectedTo).get(CDTUser_.number));
+    }
 
-   /* private Predicate hasTaskPriorities() {
-        return Optional.ofNullable(filter.getTaskPriorities())
-                .map(taskPriorities -> taskPriorities.stream()
-                        .map(taskPriority -> EnumUtils.getEnum(CDTTaskPriority.class, taskPriority))
-                        .collect(Collectors.toSet())
-                )
-                .filter(java.util.function.Predicate.not(Set::isEmpty))
-                .map(productTypes -> root.get(IDDFile_.productType).in(productTypes))
-                .orElse(null);
-    }*/
+    private Predicate hasTaskPriorities() {
+        return isInEnum(CDTTaskPriority.class, filter.getTaskPriorities(), root.get(IDDFile_.task).get(CDTTask_.priority));
+    }
 }

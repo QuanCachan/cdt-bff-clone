@@ -23,7 +23,7 @@ public class IDDFileFiltersDTO {
     private static final Set<CDTTaskPriority> TASK_PRIORITIES = new TreeSet<>(List.of(CDTTaskPriority.values()));
 
     private List<String> productTypes;
-    private List<String> enteredInputChannels;
+    private List<String> subscriptionModes;
     private LocalDateRangeDTO enteredDate;
     private List<Integer> dlgNumbers;
     private MinMaxDTO<BigDecimal> amount;
