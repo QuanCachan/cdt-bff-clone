@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" monitorInterval="30">
+    <Properties>
+        <Property name="LOG_DIR">${sys:log.directory:-./target}</Property>
+        <Property name="PID">????</Property>
+        <Property name="APP_PATTERN">%style{app_id=}{black}%style{@project.name@}{magenta}</Property>
+        <Property name="TIME_PATTERN">%style{time=}{black}%d{yyyy-MM-dd}T%d{HH:mm:ss,SSS}Z</Property>
+        <Property name="LEVEL_PATTERN">%style{level=}{black}%highlight{%-5p}{FATAL=white, ERROR=red, WARN=blue, INFO=black, DEBUG=green, TRACE=blue}</Property>
+        <Property name="COMP_PATTERN">%style{component_id=}{black}%style{[%c - %F]}{cyan}</Property>
+        <Property name="CORREL_PATTERN">%style{corr_id=}{black}%style{%X{CorrelationId}}{yellow}</Property>
+        <Property name="MESSAGE_PATTERN">%enc{%m}{CRLF} %replace{%rException}{\r?\n}{\\n} %n</Property>
+        <Property name="LOG_PATTERN">${TIME_PATTERN}|${LEVEL_PATTERN}|${APP_PATTERN}|${COMP_PATTERN}|${CORREL_PATTERN}|${MESSAGE_PATTERN}</Property>
+    </Properties>
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT" follow="true">
+            <PatternLayout disableAnsi="false" alwaysWriteExceptions="false" pattern="${LOG_PATTERN}" />
+        </Console>
+    </Appenders>
+    <Loggers>
+        <Root>
+            <AppenderRef ref="Console" />
+        </Root>
+    </Loggers>
+</Configuration>
